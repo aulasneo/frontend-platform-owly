@@ -68,7 +68,7 @@ import {
 import {
   configure as configureAnalytics, SegmentAnalyticsService, identifyAnonymousUser, identifyAuthenticatedUser,
 } from './analytics';
-import { GoogleAnalyticsLoader } from './scripts';
+import { GoogleAnalyticsLoader, OwlyLoader } from './scripts';
 import {
   getAuthenticatedHttpClient,
   configure as configureAuth,
@@ -269,7 +269,7 @@ function applyOverrideHandlers(overrides) {
  * @param {*} [options.analyticsService=SegmentAnalyticsService] The `AnalyticsService`
  * implementation to use.
  * @param {*} [options.authMiddleware=[]] An array of middleware to apply to http clients in the auth service.
- * @param {*} [options.externalScripts=[GoogleAnalyticsLoader]] An array of externalScripts.
+ * @param {*} [options.externalScripts=[GoogleAnalyticsLoader, OwlyLoader]] An array of externalScripts.
  * By default added GoogleAnalyticsLoader.
  * @param {*} [options.requireAuthenticatedUser=false] If true, turns on automatic login
  * redirection for unauthenticated users.  Defaults to false, meaning that by default the
@@ -290,7 +290,7 @@ export async function initialize({
   analyticsService = SegmentAnalyticsService,
   authService = AxiosJwtAuthService,
   authMiddleware = [],
-  externalScripts = [GoogleAnalyticsLoader],
+  externalScripts = [GoogleAnalyticsLoader, OwlyLoader],
   requireAuthenticatedUser: requireUser = false,
   hydrateAuthenticatedUser: hydrateUser = false,
   messages,
@@ -314,7 +314,7 @@ export async function initialize({
 
     // This allows us to replace the implementations of the logging, analytics, and auth services
     // based on keys in the ConfigDocument.  The JavaScript File Configuration method is the only
-    // one capable of supplying an alternative implementation since it can import other modules.
+    // one capable of supplying an alternate implementation since it can import other modules.
     // If a service wasn't supplied we fall back to the default parameters on the initialize
     // function signature.
     const loggingServiceImpl = getConfig().loggingService || loggingService;
