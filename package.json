@@ -1,6 +1,6 @@
 {
   "name": "@edx/frontend-platform",
-  "version": "1.0.0-semantically-released",
+  "version": "8.4.0",
   "description": "Foundational application framework for Open edX micro-frontend applications.",
   "main": "index.js",
   "publishConfig": {
@@ -8,6 +8,7 @@
   },
   "sideEffects": false,
   "scripts": {
+    "prepare": "make build",
     "build": "make build",
     "docs": "jsdoc -c jsdoc.json",
     "docs-watch": "nodemon -w src -w docs/template -w README.md -e js,jsx --exec npm run docs",
