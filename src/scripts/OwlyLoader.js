@@ -1,51 +1,31 @@
 /**
- * Loader universal para Owly: inserta un iframe en el DOM al estilo widget.
+ * @implements {OwlyLoader}
+ * @memberof module:Owly
  */
 class OwlyLoader {
-  /**
-   * Inserta el iframe de Owly en el DOM.
-   * @param {Object} options - Configuración opcional.
-   * @param {string} [options.s3BaseUrl] - URL del iframe.
-   * @param {string} [options.containerId] - ID del contenedor.
-   */
-  static load(options = {}) {
-    // Previene doble carga
-    if (window.OwlyLoaderLoaded) return;
-    window.OwlyLoaderLoaded = true;
+  loadScript() {
+    global.owly = global.owly || [];
+    const { owly } = global;
 
-    const s3BaseUrl = options.s3BaseUrl || 'https://chat.owly.aulasneo.com/';
-    const containerId = options.containerId || 'owly-react-container';
-
-    // Crea el contenedor si no existe
-    let container = document.getElementById(containerId);
-    if (!container) {
-      container = document.createElement('div');
-      container.id = containerId;
-      container.style.width = '100%';
-      container.style.height = '100vh';
-      container.style.border = 'none';
-      document.body.appendChild(container);
-    } else {
-      container.innerHTML = '';
+    if (owly.invoked) {
+      return;
     }
 
-    // Inserta el iframe
-    const iframe = document.createElement('iframe');
-    iframe.src = s3BaseUrl;
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    iframe.allowFullscreen = true;
-    iframe.loading = 'lazy';
-    iframe.title = 'Owly Chat';
-    container.appendChild(iframe);
-  }
-}
+    owly.invoked = true;
 
-// Autoejecuta si hay configuración global
-if (typeof window !== 'undefined') {
-  const config = window.OwlyLoaderConfig || {};
-  OwlyLoader.load(config);
+    owly.load = (key, options) => {
+      const scriptSrc = document.createElement('script');
+      scriptSrc.type = 'text/javascript';
+      scriptSrc.async = true;
+      scriptSrc.src = 'https://chat.owly.aulasneo.com/owly-chatbot-embed.min.js';
+      const first = document.getElementsByTagName('script')[0];
+      first.parentNode.insertBefore(scriptSrc, first);
+
+      owly._loadOptions = options;
+    };
+
+    owly.load();
+  }
 }
 
 export default OwlyLoader;
