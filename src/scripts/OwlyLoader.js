@@ -17,7 +17,7 @@ class OwlyLoader {
       const scriptSrc = document.createElement('script');
       scriptSrc.type = 'text/javascript';
       scriptSrc.async = true;
-      scriptSrc.src = 'https://chat.owly.aulasneo.com/owly-chatbot-embed.min.js?env=dev';
+      scriptSrc.src = 'https://chat.owly.aulasneo.com/dev/owly-chatbot-embed.min.js';
       const first = document.getElementsByTagName('script')[0];
       first.parentNode.insertBefore(scriptSrc, first);
 
