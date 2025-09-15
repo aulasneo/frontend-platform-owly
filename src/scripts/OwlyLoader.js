@@ -54,7 +54,7 @@ class OwlyLoader {
     try {
       const { LMS_BASE_URL } = getConfig();
       const base = (LMS_BASE_URL || '').replace(/\/$/, '');
-      const flagUrl = `${base}/api/v1/owly-config/enable_owly_chat`;
+      const flagUrl = `${base}/api/v1/owly-config/enable_owly_chat/`;
 
       fetch(flagUrl, { credentials: 'include' })
         .then((res) => {
