@@ -24,7 +24,7 @@ class OwlyLoader {
     // 4) Evitar inyección duplicada del script
     const existingScript = (typeof document !== 'undefined') && (
       document.querySelector('script[data-owly-embed="true"]') ||
-      document.querySelector('script[src*="chat.owly.aulasneo.com/owly-chatbot-embed.min.js"]')
+      document.querySelector('script[src*="chat.owly-dev.aulasneo.link/owly-chatbot-embed.min.js"]')
     );
     if (existingScript) {
       owly.invoked = true;
@@ -39,7 +39,7 @@ class OwlyLoader {
       const scriptSrc = document.createElement('script');
       scriptSrc.type = 'text/javascript';
       scriptSrc.async = true;
-      scriptSrc.src = 'https://chat.owly.aulasneo.com/owly-chatbot-embed.min.js';
+      scriptSrc.src = 'https://chat.owly-dev.aulasneo.link/owly-chatbot-embed.min.js';
       scriptSrc.setAttribute('data-owly-embed', 'true');
       const first = document.getElementsByTagName('script')[0];
       first?.parentNode?.insertBefore(scriptSrc, first);
