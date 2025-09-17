@@ -5,6 +5,10 @@ import { getConfig } from '@edx/frontend-platform';
  * @memberof module:Owly
  */
 class OwlyLoader {
+  constructor(data = {}) {
+    this.data = data;
+  }
+
   loadScript() {
     // 1) Evitar ejecución dentro de iframes
     if (typeof window !== 'undefined' && window.self !== window.top) {
@@ -54,9 +58,13 @@ class OwlyLoader {
     try {
       const { LMS_BASE_URL } = getConfig();
       const base = (LMS_BASE_URL || '').replace(/\/$/, '');
-      const flagUrl = `${base}/api/v1/owly-config/enable_owly_chat/`;
+      const url = new URL(`${base}/api/v1/owly-config/enable_owly_chat/`);
+      const email = this?.data?.user?.email;
+      if (email) {
+        url.searchParams.set('email', email);
+      }
 
-      fetch(flagUrl, { credentials: 'include' })
+      fetch(url.toString(), { credentials: 'include' })
         .then((res) => {
           if (!res.ok) { throw new Error(`HTTP ${res.status}`); }
           return res.json().catch(() => ({}));
