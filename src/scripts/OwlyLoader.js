@@ -59,18 +59,20 @@ class OwlyLoader {
       const { LMS_BASE_URL } = getConfig();
       const base = (LMS_BASE_URL || '').replace(/\/$/, '');
       const url = new URL(`${base}/api/v1/owly-config/enable_owly_chat/`);
-      const email = this?.data?.user?.email;
-      if (email) {
-        url.searchParams.set('email', email);
-      }
 
-      fetch(url.toString(), { credentials: 'include' })
+      fetch(url.toString(), { 
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
         .then((res) => {
           if (!res.ok) { throw new Error(`HTTP ${res.status}`); }
           return res.json().catch(() => ({}));
         })
         .then((data) => {
-          if (data && data.enabled === true) {
+          if (data?.enabled === true && data?.user_has_permission === true) {
             inject();
           }
         })
