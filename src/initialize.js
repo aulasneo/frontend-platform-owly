@@ -308,9 +308,7 @@ export async function initialize({
     await runtimeConfig();
     publish(APP_CONFIG_INITIALIZED);
 
-    loadExternalScripts(externalScripts, {
-      config: getConfig(),
-    });
+    // External scripts are loaded AFTER auth so they can receive the authenticated user.
 
     // This allows us to replace the implementations of the logging, analytics, and auth services
     // based on keys in the ConfigDocument.  The JavaScript File Configuration method is the only
@@ -346,6 +344,12 @@ export async function initialize({
 
     await handlers.auth(requireUser, hydrateUser);
     publish(APP_AUTH_INITIALIZED);
+
+    // Now that auth is initialized, load external scripts with access to the authenticated user.
+    loadExternalScripts(externalScripts, {
+      config: getConfig(),
+      user: getAuthenticatedUser(),
+    });
 
     // Analytics
     configureAnalytics(analyticsServiceImpl, {

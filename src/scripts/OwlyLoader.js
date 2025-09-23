@@ -1,14 +1,21 @@
+import { getConfig } from '@edx/frontend-platform';
+
 /**
  * @implements {OwlyLoader}
  * @memberof module:Owly
  */
 class OwlyLoader {
+  constructor(data = {}) {
+    this.data = data;
+  }
+
   loadScript() {
     // 1) Evitar ejecución dentro de iframes
     if (typeof window !== 'undefined' && window.self !== window.top) {
       return;
     }
 
+    
     // 2) Usar referencia segura al objeto global
     const root = (typeof window !== 'undefined') ? window : globalThis;
     root.owly = root.owly || [];
@@ -29,21 +36,53 @@ class OwlyLoader {
       return;
     }
 
-    owly.invoked = true;
+    // 5) Función de inyección real (marca invoked cuando realmente inyecta)
+    const inject = (loadOptions) => {
+      if (owly.invoked) return;
+      owly.invoked = true;
 
-    owly.load = (key, options) => {
       const scriptSrc = document.createElement('script');
       scriptSrc.type = 'text/javascript';
       scriptSrc.async = true;
       scriptSrc.src = 'https://chat.owly.aulasneo.com/owly-chatbot-embed.min.js';
       scriptSrc.setAttribute('data-owly-embed', 'true');
       const first = document.getElementsByTagName('script')[0];
-      first.parentNode.insertBefore(scriptSrc, first);
+      first?.parentNode?.insertBefore(scriptSrc, first);
 
-      owly._loadOptions = options;
+      owly._loadOptions = loadOptions;
     };
 
-    owly.load();
+    // Mantener API owly.load para compatibilidad (inyecta inmediatamente)
+    owly.load = (key, loadOptions) => inject(loadOptions);
+
+    // 6) Consultar endpoint del LMS para el waffle flag y decidir
+    try {
+      const { LMS_BASE_URL } = getConfig();
+      const base = (LMS_BASE_URL || '').replace(/\/$/, '');
+      const url = new URL(`${base}/api/v1/owly-config/enable_owly_chat/`);
+
+      fetch(url.toString(), { 
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then((res) => {
+          if (!res.ok) { throw new Error(`HTTP ${res.status}`); }
+          return res.json().catch(() => ({}));
+        })
+        .then((data) => {
+          if (data?.enabled === true && data?.user_has_permission === true) {
+            inject();
+          }
+        })
+        .catch(() => {
+          // Si falla la consulta, no inyectamos el script
+        });
+    } catch (_e) {
+      // Silencioso; no inyectar en caso de error
+    }
   }
 }
 
